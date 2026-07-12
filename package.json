@@ -1,0 +1,21 @@
+{
+  "name": "quality-buddy",
+  "version": "1.0.0",
+  "description": "Rotate team members into a Quality Buddy each sprint",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently -n backend,frontend -c blue,green \"npm:dev:backend\" \"npm:dev:frontend\"",
+    "dev:backend": "npm --workspace backend run dev",
+    "dev:frontend": "npm --workspace frontend run dev",
+    "build": "npm --workspace frontend run build",
+    "test": "npm --workspace backend test",
+    "start": "npm --workspace backend start"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
+}
