@@ -7,6 +7,11 @@
 #
 # Data is persisted in the named volume "qb-data" at /app/data/quality-buddy.db.
 # Override settings with an .env file in this directory (see .env.example).
+#
+# To change the host port (e.g. 8080), set HOST_PORT in .env or in your shell:
+#   HOST_PORT=8080 docker compose up -d
+# To bind to host only (not the LAN), change the ports line to:
+#   - "127.0.0.1:${HOST_PORT:-3001}:${PORT:-3001}"
 
 services:
   app:
@@ -17,19 +22,18 @@ services:
     container_name: quality-buddy
     restart: unless-stopped
     ports:
-      # LAN-accessible. Change "3001:3001" to "127.0.0.1:3001:3001" to
-      # restrict to the host only.
-      - "3001:3001"
+      # External:Internal — change HOST_PORT in .env to remap
+      - "${HOST_PORT:-3001}:${PORT:-3001}"
     environment:
       NODE_ENV: production
-      PORT: "3001"
+      PORT: "${PORT:-3001}"
       HOST: "0.0.0.0"
       QB_DB_PATH: /app/data/quality-buddy.db
       # TZ: "America/Los_Angeles"   # uncomment to set the container timezone
     volumes:
       - qb-data:/app/data
     healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3001/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:'+(process.env.PORT||3001)+'/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 30s
       timeout: 5s
       retries: 3
