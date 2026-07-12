@@ -51,7 +51,7 @@ function formatSlackText(sprint, rows) {
     '',
   ];
   for (const r of rows) {
-    lines.push(`${r.memberName} → ${r.buddyName}`);
+    lines.push(`${r.memberName}'s buddy: ${r.buddyName}`);
   }
   return lines.join('\n');
 }

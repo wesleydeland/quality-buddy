@@ -14,7 +14,7 @@ export function formatSlackText(sprint, assignments) {
     '',
   ];
   for (const a of assignments) {
-    lines.push(`${a.member_name} → ${a.buddy_name}`);
+    lines.push(`${a.member_name}'s buddy: ${a.buddy_name}`);
   }
   return lines.join('\n');
 }

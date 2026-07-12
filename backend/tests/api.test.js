@@ -113,9 +113,9 @@ test('integration: full sprint workflow', async () => {
     r = await fetch(`${base}/api/sprints/${sprint1.id}/slack`);
     const text = await r.text();
     assert.match(text, /📋 Sprint 1 — Quality Buddies/);
-    assert.match(text, /Alice → Bob/);
-    assert.match(text, /Bob → Charlie/);
-    assert.match(text, /Charlie → Alice/);
+    assert.match(text, /Alice's buddy: Bob/);
+    assert.match(text, /Bob's buddy: Charlie/);
+    assert.match(text, /Charlie's buddy: Alice/);
   } finally {
     server.close();
     closeDb();

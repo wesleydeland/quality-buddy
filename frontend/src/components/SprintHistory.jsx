@@ -57,10 +57,16 @@ export default function SprintHistory({ refreshSignal }) {
               <div className="history-detail">
                 <ul className="assignments compact">
                   {detail.assignments.map((a) => (
-                    <li key={a.id}>
-                      <span className="member">{a.member_name}</span>
-                      <span className="arrow">→</span>
-                      <span className="buddy">{a.buddy_name}</span>
+                    <li key={a.id} className="assignment-row">
+                      <div className="assignment-developer">
+                        <span className="role-label">Developer</span>
+                        <span className="name">{a.member_name}</span>
+                      </div>
+                      <span className="assignment-sep" aria-hidden="true">→</span>
+                      <div className="assignment-buddy">
+                        <span className="role-label">Quality Buddy</span>
+                        <span className="name">{a.buddy_name}</span>
+                      </div>
                     </li>
                   ))}
                 </ul>

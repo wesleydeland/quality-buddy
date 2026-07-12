@@ -127,9 +127,9 @@ test('formatSlackText: produces the expected plaintext', () => {
     '📋 Sprint 7 — Quality Buddies',
     '📅 Jul 24 – Aug 7',
     '',
-    'Alice → Bob',
-    'Bob → Charlie',
-    'Charlie → Alice',
+    "Alice's buddy: Bob",
+    "Bob's buddy: Charlie",
+    "Charlie's buddy: Alice",
   ].join('\n');
   assert.strictEqual(out, expected);
 });
