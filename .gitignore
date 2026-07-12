@@ -11,3 +11,6 @@ data/
 # Docker
 .docker/
 *.tar
+
+# Hermes session artifacts (plans, scratch files)
+.hermes/
