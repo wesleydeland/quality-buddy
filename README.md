@@ -1,5 +1,10 @@
 # Quality Buddy
 
+[![License: MIT](https://img.shields.io/github/license/wesleydeland/quality-buddy)](./LICENSE)
+[![Tests](https://github.com/wesleydeland/quality-buddy/actions/workflows/test.yml/badge.svg)](https://github.com/wesleydeland/quality-buddy/actions/workflows/test.yml)
+[![Docker](https://github.com/wesleydeland/quality-buddy/actions/workflows/docker.yml/badge.svg)](https://github.com/wesleydeland/quality-buddy/actions/workflows/docker.yml)
+[![Version](https://img.shields.io/github/package-json/v/wesleydeland/quality-buddy?color=blue)](./package.json)
+
 A small full-stack webapp for rotating your team into a peer "Quality Buddy" each
 sprint. Node + Express + SQLite backend, React (Vite) frontend. No auth, designed
 to be accessed on the local network.

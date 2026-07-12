@@ -15,6 +15,9 @@ data/
 # Hermes session artifacts (plans, scratch files)
 .hermes/
 
+# AI-agent skill libraries (third-party reference material, not app code)
+.agents/
+
 #aspire
 .aspire/
 .aspire/integrations/package-restore/

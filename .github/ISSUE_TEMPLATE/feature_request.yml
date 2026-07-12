@@ -1,0 +1,41 @@
+name: Feature request
+description: Suggest an idea or improvement.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the problem first, then the solution. This makes it easier to
+        discuss alternatives.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is the problem or missing capability? Is it related to a frustration with the current UI/API?
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: How would you like to see it solved? Be specific — describe the UI flow or API shape if relevant.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any other approaches you considered, and why you prefer the proposed one.
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Anything else that helps — screenshots, related issues, links.
+    validations:
+      required: false

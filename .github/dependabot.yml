@@ -1,0 +1,48 @@
+# Dependabot configuration
+# Docs: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates
+
+version: 2
+
+updates:
+  # Root npm workspace: `backend/` and `frontend/` are declared under
+  # `workspaces` in the root package.json, so this entry covers both.
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    commit-message:
+      prefix: "deps"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 5
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
+
+  # `aspire-apphost/` is a standalone package (not part of the npm workspace),
+  # so it needs its own entry.
+  - package-ecosystem: "npm"
+    directory: "/aspire-apphost"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    commit-message:
+      prefix: "deps(apphost)"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 3
+
+  # GitHub Actions: keep workflow pins up to date.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    commit-message:
+      prefix: "ci"
+    labels:
+      - "dependencies"
+      - "ci"
