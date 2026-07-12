@@ -13,7 +13,10 @@
     "dev:frontend": "npm --workspace frontend run dev",
     "build": "npm --workspace frontend run build",
     "test": "npm --workspace backend test",
-    "start": "npm --workspace backend start"
+    "start": "npm --workspace backend start",
+    "aspire:start": "npm --prefix aspire-apphost run aspire:start",
+    "aspire:build": "npm --prefix aspire-apphost run aspire:build",
+    "aspire:dev": "npm --prefix aspire-apphost run aspire:dev"
   },
   "devDependencies": {
     "concurrently": "^9.0.0"

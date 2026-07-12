@@ -14,3 +14,8 @@ data/
 
 # Hermes session artifacts (plans, scratch files)
 .hermes/
+
+#aspire
+.aspire/
+.aspire/integrations/package-restore/
+.aspire/integrations/apphosts/

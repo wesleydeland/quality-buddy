@@ -5,11 +5,19 @@
   "main": "src/server.js",
   "type": "commonjs",
   "scripts": {
-    "dev": "node --watch src/server.js",
-    "start": "node src/server.js",
+    "dev": "node --require ./src/tracing.js --watch src/server.js",
+    "start": "node --require ./src/tracing.js src/server.js",
     "test": "node --test tests/*.test.js"
   },
   "dependencies": {
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.55.0",
+    "@opentelemetry/exporter-logs-otlp-grpc": "^0.55.0",
+    "@opentelemetry/exporter-metrics-otlp-grpc": "^0.55.0",
+    "@opentelemetry/exporter-trace-otlp-grpc": "^0.55.0",
+    "@opentelemetry/sdk-logs": "^0.55.0",
+    "@opentelemetry/sdk-metrics": "^1.28.0",
+    "@opentelemetry/sdk-node": "^0.55.0",
     "better-sqlite3": "^11.3.0",
     "cors": "^2.8.5",
     "express": "^4.21.1"

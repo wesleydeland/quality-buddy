@@ -31,6 +31,35 @@ This starts:
 
 Open `http://<your-machine-ip>:5173` from any device on the same network.
 
+## Quick start (Aspire dashboard)
+
+The app also has an [Aspire](https://aspire.dev) AppHost that runs both
+services, manages ports, and streams OpenTelemetry traces/metrics/logs to
+the Aspire dashboard.
+
+```bash
+# prerequisites
+dotnet tool install -g Aspire.Cli   # or: https://aspire.dev/install.sh
+
+# from the repo root
+aspire start                  # background
+aspire dashboard              # opens https://localhost:17098 in your browser
+```
+
+The dashboard shows live state for the `api` and `web` resources, structured
+logs from both services, and a traces view. Useful commands:
+
+```bash
+aspire ps                     # running AppHosts
+aspire stop                   # shut it down
+aspire logs <resource>        # tail logs (e.g. aspire logs api)
+aspire otel spans <resource>  # CLI view of recent spans
+aspire otel logs <resource>   # CLI view of structured logs
+```
+
+See [OpenTelemetry](#opentelemetry) below for what gets instrumented and how
+to see browser-side traces.
+
 ## Quick start (production)
 
 ```bash
@@ -85,13 +114,90 @@ volumes:
   - ./data:/app/data
 ```
 
+## OpenTelemetry
+
+The app is wired with OpenTelemetry so the Aspire dashboard gets traces,
+metrics, and structured logs from all three processes:
+
+| Process               | Source in dashboard | Traces                                       | Metrics                       | Logs                          |
+|-----------------------|---------------------|----------------------------------------------|-------------------------------|-------------------------------|
+| `api` (Express)       | `api`               | HTTP server, Express middleware, SQLite calls | HTTP request metrics, Node metrics | `console.log`/`error` bridged |
+| Vite dev server (Node)| `web`               | Manual spans only (auto-instr has ESM gaps — see below) | Node process metrics | `console.log`/`error` bridged |
+| Browser (React)       | `web`               | `fetch` / `XHR` / `document-load`            | Web vitals                    | Browser console via `withBrowserLogs()` |
+
+### What ends up in the dashboard
+
+- **Traces** — every backend HTTP request shows up as a `GET /api/...` server
+  span with Express middleware children. From the browser, every `fetch` /
+  `XHR` (including the proxied `/api/...` calls) shows up as a client span.
+- **Metrics** — request duration histograms, Node process metrics (CPU,
+  memory, event loop), and standard web metrics from the browser.
+- **Structured logs** — the `console.log` / `console.error` calls in both Node
+  services are bridged into OTel log records and appear in the dashboard's
+  structured logs view under the matching `source`.
+
+### Browser telemetry caveat
+
+The browser-side OTel SDK needs to POST to the dashboard's HTTP OTLP endpoint
+at `https://localhost:21211`. The cert is self-signed, so the first time
+the browser tries to send, it will silently block. To fix:
+
+1. Open `https://localhost:21211` in a tab.
+2. Click through the "Not Secure" warning (Advanced → Proceed to localhost).
+3. Reload the app. The browser now trusts the cert for the session and the
+   OTLP POSTs go through.
+
+You can verify the browser OTel is wired without the cert by opening the
+browser dev tools console — you should see `[otel-web] tracing ->
+https://localhost:21211/v1/traces` on page load.
+
+### Known gap: Vite dev server HTTP server spans
+
+The Vite dev server's incoming HTTP requests don't show up as `web` server
+spans. Vite imports `http` via ESM, which the OTel `instrumentation-http`
+patches can't reach via a CJS `--require` or ESM `--import` loader. Manual
+spans and the console-bridge still work; everything from the React app
+(browser) and the Express backend is fully traced.
+
+### Outside Aspire
+
+The OTel init is gated on `OTEL_EXPORTER_OTLP_ENDPOINT`. Running `npm run
+dev` (no Aspire) means the env var isn't set, so neither service starts
+the OTel SDK — same code path, no telemetry, no errors.
+
+You can force-enable OTel against a custom collector by exporting the env
+vars before `npm run dev`:
+
+```bash
+export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318
+export OTEL_EXPORTER_OTLP_HEADERS=api-key=...
+export OTEL_LOG_LEVEL=info   # optional, for SDK diag output
+npm run dev
+```
+
 ## Environment variables
+
+The backend reads these directly:
 
 | Variable     | Default                            | Description                  |
 |--------------|------------------------------------|------------------------------|
 | `PORT`       | `3001`                             | Backend listen port          |
 | `HOST`       | `0.0.0.0`                          | Backend bind address         |
 | `QB_DB_PATH` | `backend/data/quality-buddy.db`    | SQLite database file path    |
+
+When run under Aspire, these are also injected by the AppHost:
+
+| Variable                          | Set by Aspire to                          |
+|-----------------------------------|-------------------------------------------|
+| `OTEL_EXPORTER_OTLP_ENDPOINT`     | gRPC OTLP endpoint (Node exporters)       |
+| `OTEL_EXPORTER_OTLP_HEADERS`      | `x-otlp-api-key=...` (per-session key)     |
+| `OTEL_EXPORTER_OTLP_PROTOCOL`     | `grpc`                                    |
+| `OTEL_SERVICE_NAME`               | Resource name (`api` or `web`)            |
+| `OTEL_BSP_SCHEDULE_DELAY`         | `1000` (batch span processor)             |
+| `OTEL_BLRP_SCHEDULE_DELAY`        | `1000` (batch log record processor)        |
+| `OTEL_METRIC_EXPORT_INTERVAL`     | `1000` (metric reader)                    |
+| `OTEL_TRACES_SAMPLER`             | `always_on`                               |
+| `NODE_EXTRA_CA_CERTS`             | Path to Aspire's dev cert (for gRPC TLS)  |
 
 ## Usage
 
@@ -137,19 +243,26 @@ so it never touches your dev data.
 ```
 quality-buddy/
 ├── package.json                 (root, npm workspaces)
+├── aspire-apphost/
+│   ├── apphost.mts              (Aspire AppHost — wires api + web)
+│   └── package.json
+├── aspire.config.json           (dashboard ports, HTTP OTLP endpoint)
 ├── backend/
 │   ├── data/quality-buddy.db    (auto-created, gitignored)
 │   └── src/
 │       ├── server.js            (Express entry)
+│       ├── tracing.js           (Node-side OTel init, loaded via --require)
 │       ├── rotation.js          (pure algorithm)
 │       ├── db/{init.js,schema.sql}
 │       ├── routes/{members.js, sprints.js}
 │       └── tests/               (node:test)
 └── frontend/
     ├── index.html
-    ├── vite.config.js
+    ├── vite.config.js           (injects window.__OTEL_CONFIG__ for the browser SDK)
     └── src/
-        ├── main.jsx
+        ├── main.jsx             (imports instrumentation.js first)
+        ├── instrumentation.js   (browser-side OTel init)
+        ├── instrumentation.mjs (Vite Node process OTel init, via --import)
         ├── App.jsx
         ├── api.js               (fetch wrapper)
         ├── format.js            (date + slack formatting)
