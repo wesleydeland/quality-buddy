@@ -19,7 +19,7 @@
     "watch": "npm run aspire:dev"
   },
   "dependencies": {
-    "vscode-jsonrpc": "^8.2.0"
+    "vscode-jsonrpc": "^9.0.1"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
