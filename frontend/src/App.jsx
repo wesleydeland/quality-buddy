@@ -65,8 +65,12 @@ export default function App() {
 
       <div className="grid">
         <div className="col-left">
-          <CurrentSprintView sprint={current} onDeleted={handleSprintDeleted} />
-          <SprintHistory refreshSignal={refreshKey} />
+          <CurrentSprintView
+            sprint={current}
+            onDeleted={handleSprintDeleted}
+            showToast={showToast}
+          />
+          <SprintHistory refreshSignal={refreshKey} showToast={showToast} />
         </div>
         <div className="col-right">
           <NewSprintForm

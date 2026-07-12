@@ -130,14 +130,19 @@ button.danger { color: var(--danger); }
 
 .sprint-header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: flex-start;
   gap: 12px;
   margin-bottom: 16px;
 }
 .sprint-header h2 { margin: 0; }
+.sprint-header > div:first-child {
+  flex: 1 1 200px;
+  min-width: 0;
+}
 .dates { color: var(--muted); margin: 4px 0 0; font-size: 14px; }
-.sprint-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.sprint-actions { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
 
 .assignments {
   list-style: none;
@@ -208,6 +213,11 @@ button.danger { color: var(--danger); }
   padding: 8px 4px 16px;
   display: grid;
   gap: 12px;
+}
+.history-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .empty { color: var(--muted); font-style: italic; }

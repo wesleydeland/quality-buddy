@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { api } from '../api.js';
 import { formatDateRange } from '../format.js';
 import SlackCopyButton from './SlackCopyButton.jsx';
+import ImageCopyButton from './ImageCopyButton.jsx';
 
-export default function SprintHistory({ refreshSignal }) {
+export default function SprintHistory({ refreshSignal, showToast }) {
   const [sprints, setSprints] = useState([]);
   const [openId, setOpenId] = useState(null);
   const [detail, setDetail] = useState(null);
@@ -70,7 +71,14 @@ export default function SprintHistory({ refreshSignal }) {
                     </li>
                   ))}
                 </ul>
-                <SlackCopyButton sprint={detail} assignments={detail.assignments} />
+                <div className="history-actions">
+                  <SlackCopyButton sprint={detail} assignments={detail.assignments} />
+                  <ImageCopyButton
+                    sprint={detail}
+                    assignments={detail.assignments}
+                    onError={showToast}
+                  />
+                </div>
               </div>
             )}
           </li>

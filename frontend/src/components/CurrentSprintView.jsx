@@ -1,8 +1,9 @@
 import { formatDateRange } from '../format.js';
 import { api } from '../api.js';
 import SlackCopyButton from './SlackCopyButton.jsx';
+import ImageCopyButton from './ImageCopyButton.jsx';
 
-export default function CurrentSprintView({ sprint, onDeleted }) {
+export default function CurrentSprintView({ sprint, onDeleted, showToast }) {
   if (!sprint) {
     return (
       <section className="card">
@@ -27,6 +28,11 @@ export default function CurrentSprintView({ sprint, onDeleted }) {
         </div>
         <div className="sprint-actions">
           <SlackCopyButton sprint={sprint} assignments={sprint.assignments} />
+          <ImageCopyButton
+            sprint={sprint}
+            assignments={sprint.assignments}
+            onError={showToast}
+          />
           <button onClick={handleDelete} className="danger" title="Delete sprint">
             Delete
           </button>
