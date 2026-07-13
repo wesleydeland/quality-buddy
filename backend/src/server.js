@@ -9,38 +9,46 @@ const { getDb } = require('./db/init');
 const membersRouter = require('./routes/members');
 const sprintsRouter = require('./routes/sprints');
 
-const app = express();
-const PORT = Number(process.env.PORT || 3001);
-const HOST = process.env.HOST || '0.0.0.0';
+const DEFAULT_DIST_DIR = path.join(__dirname, '..', '..', 'frontend', 'dist');
 
-app.use(cors());
-app.use(express.json());
+function createApp(options = {}) {
+  const app = express();
+  const distDir = options.distDir || DEFAULT_DIST_DIR;
 
-// Initialize DB eagerly so first request doesn't pay the cost
-getDb();
+  app.use(cors());
+  app.use(express.json());
 
-app.get('/api/health', (req, res) => res.json({ ok: true }));
+  // Initialize DB eagerly so first request doesn't pay the cost
+  getDb();
 
-app.use('/api/members', membersRouter);
-app.use('/api/sprints', sprintsRouter);
+  app.get('/api/health', (req, res) => res.json({ ok: true }));
 
-// In production, serve the built React app
-const distDir = path.join(__dirname, '..', '..', 'frontend', 'dist');
-if (fs.existsSync(distDir)) {
-  app.use(express.static(distDir));
-  app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api/')) return next();
-    res.sendFile(path.join(distDir, 'index.html'));
+  app.use('/api/members', membersRouter);
+  app.use('/api/sprints', sprintsRouter);
+
+  // In production, serve the built React app
+  if (fs.existsSync(distDir)) {
+    app.use(express.static(distDir));
+    app.get('*splat', (req, res, next) => {
+      if (req.path.startsWith('/api/')) return next();
+      res.sendFile(path.join(distDir, 'index.html'));
+    });
+  }
+
+  // Centralized error handler
+  app.use((err, req, res, next) => {
+    // eslint-disable-next-line no-console
+    console.error('[server error]', err);
+    if (res.headersSent) return next(err);
+    res.status(500).json({ error: err.message || 'Internal server error' });
   });
+
+  return app;
 }
 
-// Centralized error handler
-app.use((err, req, res, next) => {
-  // eslint-disable-next-line no-console
-  console.error('[server error]', err);
-  if (res.headersSent) return next(err);
-  res.status(500).json({ error: err.message || 'Internal server error' });
-});
+const app = createApp();
+const PORT = Number(process.env.PORT || 3001);
+const HOST = process.env.HOST || '0.0.0.0';
 
 if (require.main === module) {
   app.listen(PORT, HOST, () => {
@@ -50,3 +58,4 @@ if (require.main === module) {
 }
 
 module.exports = app;
+module.exports.createApp = createApp;

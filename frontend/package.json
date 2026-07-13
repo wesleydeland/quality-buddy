@@ -1,6 +1,6 @@
 {
   "name": "quality-buddy-frontend",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "React SPA for the Quality Buddy rotation webapp",
   "private": true,
   "type": "module",

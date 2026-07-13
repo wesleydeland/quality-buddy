@@ -284,3 +284,32 @@ quality-buddy/
   sprint and re-generate (or change member order first).
 - **Backup:** `backend/data/quality-buddy.db` is the entire dataset. Copy that
   file to back up; restore by placing it back and starting the server.
+
+## Releasing
+
+The version in the root `package.json` is the single source of truth. The
+three sub-packages (`backend/`, `frontend/`, `aspire-apphost/`) are kept in
+lockstep by a `version` lifecycle hook (`scripts/sync-version.js`).
+
+To cut a release:
+
+```bash
+# Pick one:
+npm version patch     # 1.0.1 -> 1.0.2  (bug fixes, no breaking changes)
+npm version minor     # 1.0.1 -> 1.1.0  (new features, backwards-compatible)
+npm version major     # 1.0.1 -> 2.0.0  (breaking changes)
+# Or an explicit version for pre-releases:
+npm version 1.2.0-rc.1
+```
+
+`npm version` edits `package.json`, runs the `version` hook to mirror the
+new version into the three sub-packages, creates a `git commit`, and tags
+it as `v<version>`. Then:
+
+```bash
+git push --follow-tags
+gh release create v1.2.0 --notes-file CHANGELOG.md
+```
+
+The README's version badge updates automatically because it reads from the
+root `package.json`.
