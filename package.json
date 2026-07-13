@@ -1,6 +1,6 @@
 {
   "name": "quality-buddy",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Rotate team members into a Quality Buddy each sprint",
   "private": true,
   "workspaces": [
@@ -16,7 +16,8 @@
     "start": "npm --workspace backend start",
     "aspire:start": "npm --prefix aspire-apphost run aspire:start",
     "aspire:build": "npm --prefix aspire-apphost run aspire:build",
-    "aspire:dev": "npm --prefix aspire-apphost run aspire:dev"
+    "aspire:dev": "npm --prefix aspire-apphost run aspire:dev",
+    "version": "node scripts/sync-version.js"
   },
   "devDependencies": {
     "concurrently": "^10.0.3"
