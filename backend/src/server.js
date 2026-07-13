@@ -29,9 +29,10 @@ function createApp(options = {}) {
   // In production, serve the built React app
   if (fs.existsSync(distDir)) {
     app.use(express.static(distDir));
+    const indexHtml = fs.readFileSync(path.join(distDir, 'index.html'));
     app.get('*splat', (req, res, next) => {
       if (req.path.startsWith('/api/')) return next();
-      res.sendFile(path.join(distDir, 'index.html'));
+      res.type('html').send(indexHtml);
     });
   }
 
