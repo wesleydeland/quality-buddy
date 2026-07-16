@@ -4,7 +4,7 @@
 # Stage 2: minimal runtime image with only the backend + built assets.
 
 # ---------- Stage 1: build ----------
-FROM node:24.18.0-alpine3.24 AS builder
+FROM node:24-bookworm-slim AS builder
 
 WORKDIR /app
 
@@ -27,7 +27,7 @@ RUN npm run build
 RUN npm prune --omit=dev
 
 # ---------- Stage 2: runtime ----------
-FROM node:24.18.0-alpine3.24 AS runtime
+FROM node:24-bookworm-slim AS runtime
 
 # better-sqlite3 needs a working C toolchain at install time, plus these at
 # runtime. The prebuilt binaries in the builder stage already work without
