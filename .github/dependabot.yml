@@ -46,3 +46,20 @@ updates:
     labels:
       - "dependencies"
       - "ci"
+
+  # Dockerfile base image: pick up Node + Alpine security rebuilds
+  # (the tag `node:24.18.0-alpine3.24` floats on the Alpine 3.24.x
+  # line, so digest-only updates flow in as patches). Major Node bumps
+  # (e.g. 24.18.0 -> 24.19.0) also trigger PRs, but you can ignore
+  # those until you're ready to upgrade.
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    commit-message:
+      prefix: "docker"
+    labels:
+      - "dependencies"
+      - "docker"
+    open-pull-requests-limit: 3
