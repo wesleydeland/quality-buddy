@@ -38,7 +38,7 @@ FROM node:24.18.0-alpine3.24 AS runtime
 WORKDIR /app
 
 # Run as a non-root user
-RUN groupadd --system app && useradd --system --gid app --home /app --shell /usr/sbin/nologin app \
+RUN addgroup -S app && adduser -S -G app -h /app -s /sbin/nologin -D app \
     && mkdir -p /app/data \
     && chown -R app:app /app
 
