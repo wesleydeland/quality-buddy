@@ -32,7 +32,6 @@ jobs:
 
       - name: Generate image metadata
         id: meta
-        if: github.event_name != 'pull_request'
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
