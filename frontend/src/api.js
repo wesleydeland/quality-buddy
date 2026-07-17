@@ -1,9 +1,17 @@
 // Thin fetch wrapper. Throws ApiError on non-2xx with parsed error message.
 
+import posthog from './posthog.js';
+
 const BASE = '/api';
 
 async function request(method, path, body) {
-  const opts = { method, headers: {} };
+  const opts = {
+    method,
+    headers: {
+      'X-POSTHOG-DISTINCT-ID': posthog.get_distinct_id(),
+      'X-POSTHOG-SESSION-ID': posthog.get_session_id(),
+    },
+  };
   if (body !== undefined) {
     opts.headers['content-type'] = 'application/json';
     opts.body = JSON.stringify(body);
@@ -15,7 +23,9 @@ async function request(method, path, body) {
       const data = await r.json();
       if (data && data.error) msg = data.error;
     } catch (_) { /* ignore */ }
-    throw new ApiError(msg, r.status);
+    const error = new ApiError(msg, r.status);
+    posthog.captureException(error, { request_method: method, request_path: path });
+    throw error;
   }
   if (r.status === 204) return null;
   const ct = r.headers.get('content-type') || '';

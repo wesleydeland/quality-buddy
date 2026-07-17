@@ -2,6 +2,7 @@ import { formatDateRange } from '../format.js';
 import { api } from '../api.js';
 import SlackCopyButton from './SlackCopyButton.jsx';
 import ImageCopyButton from './ImageCopyButton.jsx';
+import posthog from '../posthog.js';
 
 export default function CurrentSprintView({ sprint, onDeleted, showToast }) {
   if (!sprint) {
@@ -16,6 +17,7 @@ export default function CurrentSprintView({ sprint, onDeleted, showToast }) {
   async function handleDelete() {
     if (!confirm(`Delete ${sprint.name}? This cannot be undone.`)) return;
     await api.deleteSprint(sprint.id);
+    posthog.capture('sprint_deleted', { assignment_count: sprint.assignments.length });
     onDeleted();
   }
 

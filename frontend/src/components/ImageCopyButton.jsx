@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { renderAssignmentsToPng } from '../imageExport.js';
+import posthog from '../posthog.js';
 
 /**
  * Button that copies the assignments table as a PNG image to the clipboard.
@@ -22,6 +23,10 @@ export default function ImageCopyButton({ sprint, assignments, onError }) {
       ) {
         try {
           await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+          posthog.capture('assignment_image_exported', {
+            assignment_count: assignments.length,
+            export_method: 'clipboard',
+          });
           setState('copied');
           setTimeout(() => setState('idle'), 1800);
           return;
@@ -33,6 +38,10 @@ export default function ImageCopyButton({ sprint, assignments, onError }) {
 
       // Fallback: trigger a download
       triggerDownload(blob, `${filenameFor(sprint)}.png`);
+      posthog.capture('assignment_image_exported', {
+        assignment_count: assignments.length,
+        export_method: 'download',
+      });
       onError?.('Image clipboard isn\'t available here — downloaded instead. Access the app via localhost or HTTPS to enable clipboard copying.');
       setState('error');
       setTimeout(() => setState('idle'), 3500);

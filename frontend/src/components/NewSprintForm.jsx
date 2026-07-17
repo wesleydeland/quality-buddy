@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { api } from '../api.js';
+import posthog from '../posthog.js';
 
 function todayISO() {
   return new Date().toISOString().slice(0, 10);
@@ -35,6 +36,7 @@ export default function NewSprintForm({ memberCount, onCreated }) {
         end_date: endDate,
       });
       setName('');
+      posthog.capture('sprint_created', { assignment_count: sprint.assignments.length });
       onCreated(sprint);
     } catch (err) {
       setError(err.message);

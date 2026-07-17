@@ -3,6 +3,7 @@
 const express = require('express');
 const { getDb } = require('../db/init');
 const { generateAssignments, formatSlackText } = require('../rotation');
+const { captureServerEvent } = require('../posthog');
 
 const router = express.Router();
 
@@ -108,7 +109,11 @@ router.post('/', (req, res) => {
     }
     throw err;
   }
-  res.status(201).json(loadSprintWithAssignments(db, sprintId));
+  const sprint = loadSprintWithAssignments(db, sprintId);
+  captureServerEvent(req, 'sprint_created_server', {
+    assignment_count: sprint.assignments.length,
+  });
+  res.status(201).json(sprint);
 });
 
 router.get('/:id/slack', (req, res) => {
