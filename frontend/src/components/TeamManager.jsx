@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
 import AddMemberForm from './AddMemberForm.jsx';
+import posthog from '../posthog.js';
 
 export default function TeamManager({ refreshSignal }) {
   const [members, setMembers] = useState([]);
@@ -24,6 +25,7 @@ export default function TeamManager({ refreshSignal }) {
     if (!confirm('Delete this teammate?')) return;
     try {
       await api.deleteMember(id);
+      posthog.capture('team_member_removed');
       setMembers((prev) => prev.filter((m) => m.id !== id));
     } catch (err) {
       setError(err.message);
@@ -40,6 +42,7 @@ export default function TeamManager({ refreshSignal }) {
     setMembers(arr);
     try {
       await api.reorderMembers(arr.map((m) => m.id));
+      posthog.capture('team_order_updated', { team_size: arr.length });
     } catch (err) {
       setError(err.message);
       refresh();

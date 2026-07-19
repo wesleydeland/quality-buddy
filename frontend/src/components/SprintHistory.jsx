@@ -3,6 +3,7 @@ import { api } from '../api.js';
 import { formatDateRange } from '../format.js';
 import SlackCopyButton from './SlackCopyButton.jsx';
 import ImageCopyButton from './ImageCopyButton.jsx';
+import posthog from '../posthog.js';
 
 export default function SprintHistory({ refreshSignal, showToast }) {
   const [sprints, setSprints] = useState([]);
@@ -32,7 +33,9 @@ export default function SprintHistory({ refreshSignal, showToast }) {
     }
     setOpenId(id);
     try {
-      setDetail(await api.getSprint(id));
+      const sprint = await api.getSprint(id);
+      setDetail(sprint);
+      posthog.capture('sprint_history_opened', { assignment_count: sprint.assignments.length });
     } catch (err) {
       setError(err.message);
     }

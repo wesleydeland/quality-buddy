@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { formatSlackText } from '../format.js';
+import posthog from '../posthog.js';
 
 export default function SlackCopyButton({ sprint, assignments }) {
   const [copied, setCopied] = useState(false);
@@ -19,6 +20,7 @@ export default function SlackCopyButton({ sprint, assignments }) {
       document.execCommand('copy');
       document.body.removeChild(ta);
     }
+    posthog.capture('slack_assignments_copied', { assignment_count: assignments.length });
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   }

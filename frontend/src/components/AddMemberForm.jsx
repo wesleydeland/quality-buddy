@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { api } from '../api.js';
+import posthog from '../posthog.js';
 
 export default function AddMemberForm({ onAdded }) {
   const [name, setName] = useState('');
@@ -17,6 +18,7 @@ export default function AddMemberForm({ onAdded }) {
     try {
       const member = await api.addMember(name.trim());
       setName('');
+      posthog.capture('team_member_added');
       onAdded(member);
     } catch (err) {
       setError(err.message);
