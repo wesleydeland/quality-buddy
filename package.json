@@ -20,7 +20,7 @@
     "version": "node scripts/sync-version.js"
   },
   "devDependencies": {
-    "concurrently": "^10.0.3"
+    "concurrently": "^10.0.4"
   },
   "dependencies": {
     "@posthog/react": "^1.10.3",
